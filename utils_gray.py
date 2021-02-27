@@ -125,11 +125,11 @@ class ImageToImage2D(Dataset):
         one_hot_mask: bool, if True, returns the mask in one-hot encoded form.
     """
 
-    def __init__(self, dataset_path: str, joint_transform: Callable = None, one_hot_mask: int = False) -> None:
+    def __init__(self, dataset_path: str, joint_transform: Callable = None, one_hot_mask: int = False, phase: str = None) -> None:
         self.dataset_path = dataset_path
         self.input_path = os.path.join(dataset_path, 'img')
         self.output_path = os.path.join(dataset_path, 'labelcol')
-        self.images_list = os.listdir(self.input_path)
+        self.images_list = os.listdir(self.input_path) # 获取训练集的图片路径
         self.one_hot_mask = one_hot_mask
 
         if joint_transform:

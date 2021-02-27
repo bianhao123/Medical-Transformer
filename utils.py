@@ -8,6 +8,8 @@ from torch.utils.data import Dataset
 from torchvision import transforms as T
 from torchvision.transforms import functional as F
 
+from sklearn.model_selection import train_test_split
+
 from typing import Callable
 import os
 import cv2
@@ -125,11 +127,18 @@ class ImageToImage2D(Dataset):
         one_hot_mask: bool, if True, returns the mask in one-hot encoded form.
     """
 
-    def __init__(self, dataset_path: str, joint_transform: Callable = None, one_hot_mask: int = False) -> None:
+    def __init__(self, dataset_path: str, joint_transform: Callable = None, one_hot_mask: int = False, phase: str = None) -> None:
         self.dataset_path = dataset_path
         self.input_path = os.path.join(dataset_path, 'img')
         self.output_path = os.path.join(dataset_path, 'labelcol')
         self.images_list = os.listdir(self.input_path)
+        self.phase = phase
+        train_set, test_set = train_test_split(self.images_list, random_state=43)
+        if self.phase in 'train':
+            self.images_list = train_set
+        else:
+            self.images_list = test_set
+
         self.one_hot_mask = one_hot_mask
 
         if joint_transform:
@@ -139,7 +148,7 @@ class ImageToImage2D(Dataset):
             self.joint_transform = lambda x, y: (to_tensor(x), to_tensor(y))
 
     def __len__(self):
-        return len(os.listdir(self.input_path))
+        return len(self.images_list)
 
     def __getitem__(self, idx):
         image_filename = self.images_list[idx]
